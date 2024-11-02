@@ -65,14 +65,9 @@ class Game:
     
     version_text = self.fonts["small"].render(config.VERSION, True, cores.BLACK)
     version_text_rect = version_text.get_rect(bottomright=(config.WINDOW_WIDTH - 16, config.WINDOW_HEIGHT - 16))
-    self.surface.blit(version_text, version_text_rect)
+    self.surface.blit(version_text, version_text_rect)  
     
-    # sapos_nao_maltratados_text = self.fonts["smalltest"].render("*Quase nenhum sapo foi afetado durante o desenvolvimento desse jogo*", True, cores.BLACK)
-    # sapos_nao_maltratados_text_rect = sapos_nao_maltratados_text.get_rect(bottomleft=(12, config.WINDOW_HEIGHT - 12))
-    # self.surface.blit(sapos_nao_maltratados_text, sapos_nao_maltratados_text_rect)
-    
-    self.advice_text.draw(self.surface)
-    
+    self.advice_text.draw(self.surface)   
         
     self.start_button.check_hover(self.mouse_pos)
     self.start_button.draw(self.surface)    
