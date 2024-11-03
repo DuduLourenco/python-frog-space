@@ -21,7 +21,7 @@ from components.balaofala import BalaoFala
 from components.perguntatext import PerguntaText
 from components.respostatext import RespostaText
 
-#os.environ['SDL_VIDEO_WINDOW_POS'] = "16,48"
+os.environ['SDL_VIDEO_WINDOW_POS'] = "16,48"
 class Game:
   def __init__(self):
     pg.init()
@@ -177,21 +177,21 @@ class Game:
     self.pergunta_index = pergunta_index
     self.scene = "game"
     
-    print(pergunta_index % len(self.perguntas))   
     self.pergunta = self.perguntas[pergunta_index % len(self.perguntas)]
     
     self.palavra = self.pergunta['palavra'].upper()
+    self.palavra_sem_espacos = self.palavra.replace(" ", "")
     
     self.ultima_letra = None
     self.ultima_letra_cor = cores.BLACK
     
-    self.letras_restantes = list(self.palavra)
+    self.letras_restantes = list(self.palavra_sem_espacos)
     self.letras_usadas = []
     self.erros = 0
     self.acertos = 0
 
   def valida_letra(self, letra):
-    if self.erros >= 6 or self.acertos >= len(self.palavra):
+    if self.erros >= 6 or self.acertos >= len(self.palavra_sem_espacos):
       return
     
     letra = letra.upper()
@@ -207,7 +207,7 @@ class Game:
         if letra in self.letras_restantes:
           cor = cores.ACERTO
           self.letras_restantes = [char for char in self.letras_restantes if char != letra]
-          self.acertos = (len(self.palavra) - len(self.letras_restantes))
+          self.acertos = (len(self.palavra_sem_espacos) - len(self.letras_restantes))
         else:
           cor = cores.ERRO
           self.erros+=1
@@ -247,7 +247,7 @@ class Game:
     self.pergunta_text.draw(self.surface, self.pergunta)
     self.resposta_text.draw(self.surface, self.palavra, self.letras_usadas, self.erros)
     
-    if self.erros >= 6 or self.acertos >= len(self.palavra):
+    if self.erros >= 6 or self.acertos >= len(self.palavra_sem_espacos):
       now_time = time.time()
       
       try:

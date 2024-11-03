@@ -7,7 +7,7 @@ import cores
 class AdviceText:  
     def __init__(self, font):
         self.texts = [
-            "Quase nenhum sapo foi afetado durante o desenvolvimento desse jogo",
+            "Quase nenhum sapo foi afetado pelo desenvolvimento desse jogo",
             "No campus da PUCPR de Curitiba existem aproximadamente 14 bilhões de sapos",
             "Esse jogo foi desenvolvido como projeto final de raciocínio matemático",
             "A pizzaria pítizza não patrocinou esse jogo",

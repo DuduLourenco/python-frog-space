@@ -22,9 +22,9 @@ class RespostaText:
           text += letra + " "
           acertos += 1
         else:
-          text += "_ "  
+          text += "_ " if letra != " " else "  "  
           
-      if acertos >= len(letras):
+      if acertos >= len(palavra.replace(" ", "")):
         text_color = cores.ACERTO
       
       
@@ -32,7 +32,7 @@ class RespostaText:
       pergunta_text_rect = pergunta_text.get_rect(center=(config.WINDOW_WIDTH // 2, config.WINDOW_HEIGHT - 160))
       surface.blit(pergunta_text, pergunta_text_rect)
       
-      if acertos >= len(letras):
+      if acertos >= len(palavra.replace(" ", "")):
         next_pergunta_text = self.resposta_font.render(f"próxima pergunta em instantes...", True, cores.WHITE)
         next_pergunta_rect = next_pergunta_text.get_rect(center=(config.WINDOW_WIDTH // 2, config.WINDOW_HEIGHT - 112))
         surface.blit(next_pergunta_text, next_pergunta_rect)
