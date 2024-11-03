@@ -14,7 +14,7 @@ class Button:
     def draw(self, surface):
         # Escolhe a cor com base no estado de hover
         color = self.color_hover if self.hovered else self.color_normal
-        pg.draw.rect(surface, color, self.rect)
+        pg.draw.rect(surface, color, self.rect, border_radius=8)
 
         # Renderiza o texto no centro do botão
         text_surface = self.font.render(self.text, True, cores.BLACK)
