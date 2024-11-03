@@ -29,5 +29,5 @@ class AdviceText:
             
         # Cria a superfície do texto e posiciona
         text = self.font.render(self.text, True, cores.BLACK)
-        text_rect = text.get_rect(bottomleft=(12, config.WINDOW_HEIGHT - 12))
+        text_rect = text.get_rect(bottomleft=(16, config.WINDOW_HEIGHT - 16))
         surface.blit(text, text_rect)
