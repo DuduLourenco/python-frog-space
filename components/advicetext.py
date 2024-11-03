@@ -1,4 +1,5 @@
 import time
+import random
 
 import config
 import cores
@@ -8,8 +9,11 @@ class AdviceText:
         self.texts = [
             "Quase nenhum sapo foi afetado durante o desenvolvimento desse jogo",
             "No campus da PUCPR de Curitiba existem aproximadamente 14 bilhões de sapos",
-            "Esse jogo foi desenvolvido como projeto final de raciocínio matemático"
+            "Esse jogo foi desenvolvido como projeto final de raciocínio matemático",
+            "A pizzaria pítizza não patrocinou esse jogo",
+            "Cuidado com o sapo mascarad... aaaaaaaaaaah croac-croac!"
         ]
+        random.shuffle(self.texts)        
         self.text_index = 0    
         self.text = self.texts[self.text_index]
         self.font = font

@@ -19,6 +19,10 @@ conjuntos = [
 
 perguntas = [
   {
+    'pergunta': 'Melhor pizzaria de curitiba',    
+    'palavra': 'Pitizza'
+  },
+  {
     'pergunta': 'Quem gosta de música clássica e jazz ao mesmo tempo?',
     'palavra': 'Bruno',
     'conjuntos': conjuntos

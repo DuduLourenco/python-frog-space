@@ -1,4 +1,7 @@
 import pygame as pg
+import random
+
+import time
 
 import os
 
@@ -18,7 +21,7 @@ from components.balaofala import BalaoFala
 from components.perguntatext import PerguntaText
 from components.respostatext import RespostaText
 
-os.environ['SDL_VIDEO_WINDOW_POS'] = "16,48"
+#os.environ['SDL_VIDEO_WINDOW_POS'] = "16,48"
 class Game:
   def __init__(self):
     pg.init()
@@ -27,8 +30,10 @@ class Game:
     self.surface = pg.display.set_mode((config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
     self.loop = True
     
-    # self.scene = "menu"
-    self.start_game()
+    self.radomize_perguntas()
+    
+    self.scene = "menu"
+    # self.start_game()
     
     pg.font.init()
     
@@ -67,6 +72,17 @@ class Game:
       color_hover=cores.LIGHT_GRAY
     )
     
+    self.restart_button = Button(
+      x=config.WINDOW_WIDTH // 2 - 100, 
+      y=config.WINDOW_HEIGHT // 2 - 25, 
+      width=200, 
+      height=50, 
+      text="Reiniciar", 
+      font=self.fonts["small"], 
+      color_normal=cores.GRAY, 
+      color_hover=cores.LIGHT_GRAY
+    )
+    
     self.advice_text = AdviceText(
       font=self.fonts["smalltest"],
     )
@@ -82,6 +98,7 @@ class Game:
     
     self.resposta_text = RespostaText(
       font=self.fonts["largest"],
+      resposta_font=self.fonts["medium"],
     )
     
     self.background_image_menu = BackgroundImage()   
@@ -93,6 +110,9 @@ class Game:
     
     self.background_image_game = pg.image.load("assets/images/game.jpg").convert()      
     self.background_image_game = pg.transform.scale(self.background_image_game, (config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
+    
+    self.background_image_game_over = pg.image.load("assets/images/game_over.png").convert_alpha()      
+    self.background_image_game_over = pg.transform.scale(self.background_image_game_over, (config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
     
     self.game_balao = BalaoFala(
         x=config.WINDOW_WIDTH - 240 - 150 - 16, 
@@ -125,6 +145,8 @@ class Game:
       self.menu()
     elif self.scene == "game":
       self.game()
+    elif self.scene == "game_over":
+      self.game_over()
     else:
       self.menu()
       
@@ -133,6 +155,10 @@ class Game:
     
     pg.display.flip()
     self.clock.tick(config.FPS)
+    
+  def radomize_perguntas(self):
+    random.shuffle(perguntas)
+    self.perguntas = perguntas
     
   def menu(self):      
     self.background_image_menu.draw(self.surface)
@@ -144,12 +170,15 @@ class Game:
     self.start_button.check_hover(self.mouse_pos)
     self.start_button.draw(self.surface)    
     if(self.start_button.is_clicked(self.mouse_pos, self.mouse_pressed)):
+      self.radomize_perguntas()
       self.start_game()
       
-  def start_game(self):
+  def start_game(self, pergunta_index = 0):
+    self.pergunta_index = pergunta_index
     self.scene = "game"
     
-    self.pergunta = perguntas[0]
+    print(pergunta_index % len(self.perguntas))   
+    self.pergunta = self.perguntas[pergunta_index % len(self.perguntas)]
     
     self.palavra = self.pergunta['palavra'].upper()
     
@@ -159,14 +188,13 @@ class Game:
     self.letras_restantes = list(self.palavra)
     self.letras_usadas = []
     self.erros = 0
+    self.acertos = 0
 
   def valida_letra(self, letra):
-    letra = letra.upper()
+    if self.erros >= 6 or self.acertos >= len(self.palavra):
+      return
     
-    print(f'letras_usadas -> {self.letras_usadas}')
-    print(f'letras_restantes -> {self.letras_restantes}')
-    print(f'erros -> {self.erros}')
-    print(f'valida_letra({letra}) -> isalpha: {letra.isalpha()}, acerto: {letra in self.letras_restantes}')
+    letra = letra.upper()
     
     cor = cores.BLACK
     letra_aceita = False
@@ -179,6 +207,7 @@ class Game:
         if letra in self.letras_restantes:
           cor = cores.ACERTO
           self.letras_restantes = [char for char in self.letras_restantes if char != letra]
+          self.acertos = (len(self.palavra) - len(self.letras_restantes))
         else:
           cor = cores.ERRO
           self.erros+=1
@@ -188,7 +217,6 @@ class Game:
       self.ultima_letra = letra
       self.ultima_letra_cor = cor
              
-  
   def game(self):   
     self.surface.blit(self.background_image_game, (0, 0))
     self.surface.blit(self.sapo_advogado_image, (config.WINDOW_WIDTH - 150, config.WINDOW_HEIGHT - 466))
@@ -202,7 +230,7 @@ class Game:
     if(self.menu_button.is_clicked(self.mouse_pos, self.mouse_pressed)):
       self.scene = "menu"
       
-    self.forca_image.draw(self.surface)
+    self.forca_image.draw(self.surface, self.erros)
     
     letras_usadas_text = self.fonts["small"].render(f"Letras já usadas: {', '.join(self.letras_usadas)}", True, cores.BLACK)
     letras_usadas_text_rect = letras_usadas_text.get_rect(bottomleft=(24, config.WINDOW_HEIGHT - 48 - 6))
@@ -217,8 +245,37 @@ class Game:
       )
       
     self.pergunta_text.draw(self.surface, self.pergunta)
-    self.resposta_text.draw(self.surface, self.palavra, self.letras_usadas)
+    self.resposta_text.draw(self.surface, self.palavra, self.letras_usadas, self.erros)
+    
+    if self.erros >= 6 or self.acertos >= len(self.palavra):
+      now_time = time.time()
+      
+      try:
+        if(not self.last_time):
+          self.last_time = now_time
+      except:
+        self.last_time = now_time
+        
+      if now_time - self.last_time > 5:
+        if self.erros >= 6:
+          self.scene = "game_over"
+        else:
+          self.start_game(self.pergunta_index + 1)
+        self.last_time = None
 
+  def game_over(self):
+    self.surface.blit(self.background_image_game_over, (0, 0))
+      
+    title_text = self.fonts["title"].render("FIM DE JOGO", True, cores.BLACK)
+    title_text_rect = title_text.get_rect(center=(config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 4))
+    self.surface.blit(title_text, title_text_rect)      
+        
+    self.restart_button.check_hover(self.mouse_pos)
+    self.restart_button.draw(self.surface)    
+    if(self.restart_button.is_clicked(self.mouse_pos, self.mouse_pressed)):
+      self.radomize_perguntas()
+      self.start_game()
+    
 def main():
   game = Game()
   game.main()
