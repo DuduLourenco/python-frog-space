@@ -9,6 +9,7 @@ from components.advicetext import AdviceText
 from components.versiontext import VersionText
 from components.button import Button
 from components.background import BackgroundImage
+from components.forca import ForcaImage
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = "16,48"
 
@@ -20,7 +21,7 @@ class Game:
     self.surface = pg.display.set_mode((config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
     self.loop = True
     
-    self.scene = "menu"
+    self.scene = "game"
     
     pg.font.init()
     
@@ -62,9 +63,15 @@ class Game:
       font=self.fonts["smalltest"],
     )
     
-    self.background_image = BackgroundImage()    
+    self.background_image_menu = BackgroundImage()   
+    
+    self.forca_image = ForcaImage()
+     
     self.sapo_advogado_image = pg.image.load("assets/images/sapo_advogado.png").convert_alpha()      
     self.sapo_advogado_image = pg.transform.scale(self.sapo_advogado_image, (150, 466))
+    
+    self.background_image_game = pg.image.load("assets/images/game.jpg").convert()      
+    self.background_image_game = pg.transform.scale(self.background_image_game, (config.WINDOW_WIDTH, config.WINDOW_HEIGHT))
     
   def main(self):
     while self.loop:
@@ -78,9 +85,11 @@ class Game:
     for event in pg.event.get():
       if event.type == pg.QUIT:
         self.loop = False
+      elif event.type == pg.KEYDOWN:
+        key = event.key
+        print(f"tecla: {pg.key.name(key)}")
         
-    self.surface.fill(cores.WHITE)
-    self.background_image.draw(self.surface)
+    self.surface.fill(cores.WHITE)    
     
     if self.scene == "menu":
       self.menu()
@@ -95,7 +104,9 @@ class Game:
     pg.display.flip()
     self.clock.tick(config.FPS)
     
-  def menu(self):        
+  def menu(self):      
+    self.background_image_menu.draw(self.surface)
+      
     title_text = self.fonts["title"].render("A FORCA", True, cores.BLACK)
     title_text_rect = title_text.get_rect(center=(config.WINDOW_WIDTH / 2, config.WINDOW_HEIGHT / 4))
     self.surface.blit(title_text, title_text_rect)      
@@ -103,9 +114,16 @@ class Game:
     self.start_button.check_hover(self.mouse_pos)
     self.start_button.draw(self.surface)    
     if(self.start_button.is_clicked(self.mouse_pos, self.mouse_pressed)):
-      self.scene = "game"
+      self.start_game()
       
-  def game(self):    
+  def start_game(self):
+    self.scene = "game"
+    self.palavra = "pudim"
+    self.letras_restantes = ["p", "u", "d", "i", "m"]
+    self.letras_usadas = []
+      
+  def game(self):   
+    self.surface.blit(self.background_image_game, (0, 0))
     self.surface.blit(self.sapo_advogado_image, (config.WINDOW_WIDTH - 150, config.WINDOW_HEIGHT - 466))
     
     you_text = self.fonts["small"].render("Sapu (Você)", True, cores.WHITE)
@@ -116,6 +134,8 @@ class Game:
     self.menu_button.draw(self.surface)    
     if(self.menu_button.is_clicked(self.mouse_pos, self.mouse_pressed)):
       self.scene = "menu"
+      
+    self.forca_image.draw(self.surface)
 
 def main():
   game = Game()
