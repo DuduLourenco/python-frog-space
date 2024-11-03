@@ -5,6 +5,8 @@ import os
 import config
 import cores
 
+from perguntas import perguntas
+
 from components.advicetext import AdviceText
 from components.versiontext import VersionText
 from components.button import Button
@@ -12,57 +14,11 @@ from components.background import BackgroundImage
 from components.forca import ForcaImage
 
 from components.balaofala import BalaoFala
+
 from components.perguntatext import PerguntaText
+from components.respostatext import RespostaText
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = "16,48"
-
-conjuntos = [
-  {
-    'nome': 'Conjunto de pessoas que gostam de música clássica',
-    'valores': ['Ana','Bruno','Carla','Daniel']
-  },
-  {
-    'nome': 'Conjunto de pessoas que gostam de jazz',
-    'valores': ['Bruna','Eduarda','Fabio','Gabriela']
-  },
-  {
-    'nome': 'Conjunto de pessoas que gostam de rock',
-    'valores': ['Ana','Gabriela','Hector','Isabel']
-  },
-  {
-    'nome': 'Conjunto de pessoas que gostam de música eletrônica',
-    'valores': ['Carla','Eduarda','Isabel','Joao']
-  }
-]
-
-perguntas = [
-  {
-    'pergunta': 'Quem gosta de música clássica e jazz ao mesmo tempo?',
-    'palavra': 'Bruno',
-    'conjuntos': conjuntos
-  },
-  {
-    'pergunta': 'Quem gosta de música clássica ou jazz?',
-    'palavra': 'Ana',
-    'conjuntos': conjuntos
-  },
-  {
-    'pergunta': 'Quem gosta apenas de música clássica, mas não jazz?',
-    'palavra': 'Daniel',
-    'conjuntos': conjuntos
-  },
-  {
-    'pergunta': 'Quem gosta de rock e não gosta de música eletrônica?',
-    'palavra': 'Hector',
-    'conjuntos': conjuntos
-  },
-  {
-    'pergunta': 'Quem gosta de música eletrônica ou jazz, mas não de música clássica?',
-    'palavra': 'Eduarda',
-    'conjuntos': conjuntos
-  }
-]
-
 class Game:
   def __init__(self):
     pg.init()
@@ -122,6 +78,10 @@ class Game:
     self.pergunta_text = PerguntaText(
       font_pergunta=self.fonts["small"],
       font_conjuntos=self.fonts["smalltest"]
+    )
+    
+    self.resposta_text = RespostaText(
+      font=self.fonts["largest"],
     )
     
     self.background_image_menu = BackgroundImage()   
@@ -191,7 +151,7 @@ class Game:
     
     self.pergunta = perguntas[0]
     
-    self.palavra = self.pergunta['palavra']
+    self.palavra = self.pergunta['palavra'].upper()
     
     self.ultima_letra = None
     self.ultima_letra_cor = cores.BLACK
@@ -199,9 +159,12 @@ class Game:
     self.letras_restantes = list(self.palavra)
     self.letras_usadas = []
     self.erros = 0
-  
+
   def valida_letra(self, letra):
+    letra = letra.upper()
+    
     print(f'letras_usadas -> {self.letras_usadas}')
+    print(f'letras_restantes -> {self.letras_restantes}')
     print(f'erros -> {self.erros}')
     print(f'valida_letra({letra}) -> isalpha: {letra.isalpha()}, acerto: {letra in self.letras_restantes}')
     
@@ -254,6 +217,7 @@ class Game:
       )
       
     self.pergunta_text.draw(self.surface, self.pergunta)
+    self.resposta_text.draw(self.surface, self.palavra, self.letras_usadas)
 
 def main():
   game = Game()
